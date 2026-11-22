@@ -1,0 +1,70 @@
+name: Build scrcpy (Linux x86 32-bit)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+env:
+  GH_TOKEN: ${{ github.token }}
+
+
+jobs:
+  build-32bit:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Install Build dependencies
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+          ca-certificates curl git gcc pkg-config file cmake ninja-build \
+          libsdl2-dev:i386 libavcodec-dev:i386 libavdevice-dev:i386 libavformat-dev:i386 \
+          gcc-multilib g++-multilib libavutil-dev:i386 libswresample-dev:i386 libusb-1.0-0-dev:i386
+      
+      - name: Clone llama.cpp dhir-support 
+        run: |
+          git clone -b dhir-support https://github.com/zenteiq-research/llama.cpp 
+         
+      - name: Build llama.cpp
+        run: |
+          cd llama.cpp
+          cmake -B build -G Ninja \
+             -DCMAKE_BUILD_TYPE=Release \
+             -DCMAKE_C_FLAGS="-m32 -march=bonnell -mtune=atom  -msse2 -mfpmath=sse -D_FILE_OFFSET_BITS=64" \
+             -DCMAKE_CXX_FLAGS="-m32 -march=bonnell -mtune=atom  -msse2 -mfpmath=sse -D_FILE_OFFSET_BITS=64" \
+             -DCMAKE_EXE_LINKER_FLAGS="-m32" \
+             -DCMAKE_SHARED_LINKER_FLAGS="-m32" \
+             -DGGML_NATIVE=OFF \
+             -DGGML_AVX=OFF \
+             -DGGML_AVX2=OFF \
+             -DGGML_FMA=OFF \
+             -DGGML_F16C=OFF \
+             -DGGML_OPENMP=ON \
+             -DLLAMA_CURL=OFF \
+             -DLLAMA_BUILD_TESTS=OFF \
+             -DLLAMA_BUILD_EXAMPLES=ON \
+             -DLLAMA_BUILD_SERVER=ON 
+          ninja -C build llama-cli llama-server llama-quantize
+         
+      - name: Verify arch and bundle
+        run: |
+          file llama.cpp/build/bin/llama-cli
+          mkdir -p dist/lib
+          cp llama.cpp/build/bin/llama-cli  dist/llama-cli.bin
+          cp llama.cpp/build/bin/llama-server  dist/llama-server.bin
+          cp llama.cpp/build/bin/llama-quantize  dist/llama-quantize.bin
+
+          tar -czvf llama-cpp-linux-i386.tar.gz -C dist .
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: llama-cpp-linux-i386
+          path: llama-cpp-linux-i386.tar.gz
+          if-no-files-found: error
+          retention-days: 1
