@@ -42,18 +42,22 @@ jobs:
           patch -p2 -d llama.cpp < mychanges.patch
           cd llama.cpp
           # Create valid empty ui.h / ui.cpp stubs matching server-http.cpp
+          # Create valid empty ui.h / ui.cpp stubs matching server-http.cpp
           cat << 'UIH' > tools/server/ui.h
           #pragma once
           #include <cstddef>
-          #include <string_view>
+          #include <string>
           #include <vector>
 
           struct llama_ui_asset {
-              std::string_view path;
-              const unsigned char * data;
-              size_t size;
-              std::string_view mime_type;
-              bool gzip;
+              std::string name;
+              std::string path;
+              const unsigned char * data = nullptr;
+              size_t size = 0;
+              std::string mime_type;
+              std::string content_type;
+              std::string encoding;
+              bool gzip = false;
           };
 
           const std::vector<llama_ui_asset> & llama_ui_get_assets();
