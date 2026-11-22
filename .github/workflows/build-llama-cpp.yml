@@ -73,8 +73,10 @@ jobs:
           UICPP
 
           cat << 'UISTUB' > tools/ui/CMakeLists.txt
-          add_library(llama-ui-assets STATIC ${CMAKE_SOURCE_DIR}/tools/server/ui.cpp)
-          target_include_directories(llama-ui-assets PUBLIC ${CMAKE_SOURCE_DIR}/tools/server)
+          add_library(llama-ui STATIC ${CMAKE_SOURCE_DIR}/tools/server/ui.cpp)
+          target_include_directories(llama-ui PUBLIC ${CMAKE_SOURCE_DIR}/tools/server)
+          add_library(llama-ui-assets INTERFACE)
+          target_link_libraries(llama-ui-assets INTERFACE llama-ui)
           UISTUB
           
           cmake -B build -G Ninja \
