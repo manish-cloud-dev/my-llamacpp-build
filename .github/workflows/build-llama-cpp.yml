@@ -60,7 +60,8 @@ jobs:
              -DLLAMA_BUILD_TESTS=OFF \
              -DLLAMA_BUILD_EXAMPLES=ON \
              -DLLAMA_BUILD_SERVER=ON 
-          ninja -C build llama-cli llama-server llama-quantize
+          #ninja -C build llama-cli llama-server llama-quantize
+          ninja -C build llama-cli llama-quantize
          
       - name: Verify arch and bundle
         run: |
