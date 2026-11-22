@@ -41,13 +41,32 @@ jobs:
           patch --dry-run -p2 -d llama.cpp < mychanges.patch
           patch -p2 -d llama.cpp < mychanges.patch
           cd llama.cpp
-          # Stub out tools/ui so it generates empty ui.cpp/ui.h without downloading from Hugging Face
+          
+          # Create valid empty ui.h / ui.cpp stubs directly in tools/server and tools/ui
+          cat << 'UIH' > tools/server/ui.h
+          #pragma once
+          #include <cstddef>
+          #include <string_view>
+          struct ui_asset {
+              std::string_view path;
+              const unsigned char * data;
+              size_t size;
+              std::string_view mime_type;
+              bool gzip;
+          };
+          extern const ui_asset ui_assets[];
+          extern const size_t ui_assets_count;
+          UIH
+
+          cat << 'UICPP' > tools/server/ui.cpp
+          #include "ui.h"
+          const ui_asset ui_assets[] = {{ "", nullptr, 0, "", false }};
+          const size_t ui_assets_count = 0;
+          UICPP
+
           cat << 'UISTUB' > tools/ui/CMakeLists.txt
-          add_custom_command(
-              OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/ui.cpp ${CMAKE_CURRENT_BINARY_DIR}/ui.h
-              COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_CURRENT_BINARY_DIR}/ui.cpp ${CMAKE_CURRENT_BINARY_DIR}/ui.h
-          )
-          add_custom_target(llama-ui-assets DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/ui.cpp ${CMAKE_CURRENT_BINARY_DIR}/ui.h)
+          add_library(llama-ui-assets STATIC ${CMAKE_SOURCE_DIR}/tools/server/ui.cpp)
+          target_include_directories(llama-ui-assets PUBLIC ${CMAKE_SOURCE_DIR}/tools/server)
           UISTUB
           
           cmake -B build -G Ninja \
