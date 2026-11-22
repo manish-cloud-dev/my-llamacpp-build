@@ -66,27 +66,22 @@ jobs:
              -DLLAMA_BUILD_EXAMPLES=OFF \
              -DLLAMA_BUILD_SERVER=OFF
           #ninja -C build llama-cli llama-server llama-quantize
-          ninja -C build llama-cli llama-quantize
+          ninja -C build llama-app
          
       - name: Verify arch and bundle
         run: |
-          file llama.cpp/build/bin/llama-cli
-          ls -lh -- llama.cpp/build/bin/llama-cli
-          #ls -lh -- llama.cpp/build/bin/llama-server
-          ls -lh -- llama.cpp/build/bin/llama-quantize
+          file llama.cpp/build/bin/llama-app
           mkdir -p dist/lib
-          cp llama.cpp/build/bin/llama-cli  dist/llama-cli.bin
-          #cp llama.cpp/build/bin/llama-server  dist/llama-server.bin
-          cp llama.cpp/build/bin/llama-quantize  dist/llama-quantize.bin
+          cp llama.cpp/build/bin/llama-app  dist/llama-app.bin
           cp -vL llama.cpp/build/bin/*.so dist/lib/ 2>/dev/null || true
           
           #bundle 
-          ldd dist/llama-cli.bin | grep "=> /" | awk '{print $3}' | xargs -I '{}' cp -vL '{}' dist/lib/
+          ldd dist/llama-app.bin | grep "=> /" | awk '{print $3}' | xargs -I '{}' cp -vL '{}' dist/lib/
           cp -vL /lib/ld-linux.so.2 dist/lib/
           
           #create wrapper
           #for bin in llama-cli llama-server llama-quantize; do
-          for bin in llama-cli llama-quantize; do
+          for bin in llama-app; do
              cat << WRAP > "dist/$bin"
              #!/bin/sh
              DIR="\$(cd "\$(dirname "\$0")" && pwd)"
