@@ -43,7 +43,6 @@ jobs:
           cd llama.cpp
           # Remove ui, server, and app from tools/CMakeLists.txt so only CLI tools are configured
           sed -i '/add_subdirectory(ui)/d' tools/CMakeLists.txt
-          sed -i '/add_subdirectory(server)/d' tools/CMakeLists.txt
           sed -i '/add_subdirectory(app)/d' tools/CMakeLists.txt
           
           cmake -B build -G Ninja \
@@ -59,12 +58,11 @@ jobs:
              -DGGML_F16C=OFF \
              -DGGML_OPENMP=ON \
              -DLLAMA_CURL=OFF \
-             -DLLAMA_BUILD_WEBUI=OFF \
              -DLLAMA_BUILD_UI=OFF \
              -DLLAMA_BUILD_SERVER=OFF \
              -DLLAMA_BUILD_TESTS=OFF \
              -DLLAMA_BUILD_EXAMPLES=OFF \
-             -DLLAMA_BUILD_SERVER=OFF
+             -DLLAMA_BUILD_SERVER=ON
           #ninja -C build llama-cli llama-server llama-quantize
           ninja -C build llama-app
          
