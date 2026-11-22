@@ -32,7 +32,10 @@ jobs:
          
       - name: Build llama.cpp
         run: |
+          patch --dry-run -p2 -d llama.cpp < mychanges.patch
+          patch -p2 -d llama.cpp < mychanges.patch
           cd llama.cpp
+
           cmake -B build -G Ninja \
              -DCMAKE_BUILD_TYPE=Release \
              -DCMAKE_C_FLAGS="-m32 -march=bonnell -mtune=atom  -msse2 -mfpmath=sse -D_FILE_OFFSET_BITS=64" \
@@ -46,6 +49,7 @@ jobs:
              -DGGML_F16C=OFF \
              -DGGML_OPENMP=ON \
              -DLLAMA_CURL=OFF \
+             -DLLAMA_BUILD_WEBUI=OFF \
              -DLLAMA_BUILD_TESTS=OFF \
              -DLLAMA_BUILD_EXAMPLES=ON \
              -DLLAMA_BUILD_SERVER=ON 
@@ -54,6 +58,9 @@ jobs:
       - name: Verify arch and bundle
         run: |
           file llama.cpp/build/bin/llama-cli
+          ls -lh -- llama.cpp/build/bin/llama-cli
+          ls -lh -- llama.cpp/build/bin/llama-server
+          ls -lh -- llama.cpp/build/bin/llama-quantize
           mkdir -p dist/lib
           cp llama.cpp/build/bin/llama-cli  dist/llama-cli.bin
           cp llama.cpp/build/bin/llama-server  dist/llama-server.bin

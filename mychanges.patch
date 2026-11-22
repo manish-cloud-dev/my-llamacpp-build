@@ -1,0 +1,24 @@
+diff -ruN tmp/llama.cpp-master/src/llama-model-loader.cpp llama.cpp-master/src/llama-model-loader.cpp
+--- tmp/llama.cpp-master/src/llama-model-loader.cpp	2026-10-29 12:27:18.000000000 +0530
++++ llama.cpp-master/src/llama-model-loader.cpp	2026-10-29 14:31:01.073016172 +0530
+@@ -1101,7 +1101,7 @@
+     }
+ 
+     // do not lazy-read small tensors, it has significant overhead and is not worth it
+-    constexpr size_t auto_min_size = 4ull * 1024 * 1024 * 1024;
++    constexpr size_t auto_min_size = 4ull * 1024 * 1024 * 512;
+     if (mode != LLAMA_LAZY_MODE_ON && ggml_nbytes(t) <= auto_min_size) {
+         return false;
+     }
+diff -ruN tmp/llama.cpp-master/src/llama-quant.cpp llama.cpp-master/src/llama-quant.cpp
+--- tmp/llama.cpp-master/src/llama-quant.cpp	2026-10-29 12:27:18.000000000 +0530
++++ llama.cpp-master/src/llama-quant.cpp	2026-10-29 14:29:11.894983865 +0530
+@@ -41,7 +41,7 @@
+ };
+ 
+ // max amount of tensor data kept in memory while quantizing a single tensor
+-static const size_t LLAMA_QUANT_MAX_BUF_SIZE = 8ull*1024*1024*1024;
++static const size_t LLAMA_QUANT_MAX_BUF_SIZE = 8ull*1024*1024*256;
+ 
+ static void zeros(std::ofstream & file, size_t n) {
+     char zero = 0;
