@@ -56,6 +56,7 @@ jobs:
              -DGGML_OPENMP=ON \
              -DLLAMA_CURL=OFF \
              -DLLAMA_BUILD_WEBUI=OFF \
+             -DLLAMA_BUILD_UI=OFF \
              -DLLAMA_BUILD_SERVER=OFF \
              -DLLAMA_BUILD_TESTS=OFF \
              -DLLAMA_BUILD_EXAMPLES=ON \
