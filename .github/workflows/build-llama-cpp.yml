@@ -41,6 +41,7 @@ jobs:
           patch --dry-run -p2 -d llama.cpp < mychanges.patch
           patch -p2 -d llama.cpp < mychanges.patch
           cd llama.cpp
+          sed -i '/add_subdirectory(ui)/d' tools/CMakeLists.txt
 
           cmake -B build -G Ninja \
              -DCMAKE_BUILD_TYPE=Release \
