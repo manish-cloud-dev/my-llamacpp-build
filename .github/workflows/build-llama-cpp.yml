@@ -25,7 +25,10 @@ jobs:
           ca-certificates curl git gcc pkg-config file cmake ninja-build \
           libsdl2-dev:i386 libavcodec-dev:i386 libavdevice-dev:i386 libavformat-dev:i386 \
           gcc-multilib g++-multilib libavutil-dev:i386 libswresample-dev:i386 libusb-1.0-0-dev:i386
-      
+
+      - name: Clone  myown repo for patch file
+        uses: actions/checkout@v4
+              
       - name: Clone llama.cpp dhir-support 
         run: |
           git clone -b dhir-support https://github.com/zenteiq-research/llama.cpp 
@@ -35,7 +38,7 @@ jobs:
           pwd
           ls -l
           ls -l ..
-          patch --dry-run -p2 -d llama.cpp < ../mychanges.patch
+          patch --dry-run -p2 -d llama.cpp < mychanges.patch
           patch -p2 -d llama.cpp < mychanges.patch
           cd llama.cpp
 
@@ -68,6 +71,22 @@ jobs:
           cp llama.cpp/build/bin/llama-cli  dist/llama-cli.bin
           cp llama.cpp/build/bin/llama-server  dist/llama-server.bin
           cp llama.cpp/build/bin/llama-quantize  dist/llama-quantize.bin
+          cp -vL llama.cpp/build/bin/*.so dist/lib/ 2>/dev/null || true
+          
+          #bundle 
+          ldd dist/llama-cli.bin | grep "=> /" | awk '{print $3}' | xargs -I '{}' cp -vL '{}' dist/lib/
+          cp -vL /lib/ld-linux.so.2 dist/lib/
+          
+          #create wrapper
+          for bin in llama-cli llama-server llama-quantize; do
+             cat << WRAP > "dist/$bin"
+             #!/bin/sh
+             DIR="\$(cd "\$(dirname "\$0")" && pwd)"
+             exec "\$DIR/lib/ld-linux.so.2" --library-path "\$DIR/lib" "\$DIR/$bin.bin" "\$@"
+             WRAP
+             
+             chmod +x  "dist/$bin"
+          done
 
           tar -czvf llama-cpp-linux-i386.tar.gz -C dist .
 
