@@ -81,15 +81,19 @@ jobs:
           
           cmake -B build -G Ninja \
              -DCMAKE_BUILD_TYPE=Release \
-             -DCMAKE_C_FLAGS="-m32 -march=bonnell -mtune=atom  -msse2 -mfpmath=sse -D_FILE_OFFSET_BITS=64" \
-             -DCMAKE_CXX_FLAGS="-m32 -march=bonnell -mtune=atom  -msse2 -mfpmath=sse -D_FILE_OFFSET_BITS=64" \
+             -DCMAKE_C_FLAGS="-m32 -march=pentium4 -msse2 -mno-sse3 -mno-ssse3 -mno-sse4.1 -mno-sse4.2 -mno-avx -mfpmath=sse -D_FILE_OFFSET_BITS=64" \
+             -DCMAKE_CXX_FLAGS="-m32 -march=pentium4 -msse2 -mno-sse3 -mno-ssse3 -mno-sse4.1 -mno-sse4.2 -mno-avx -mfpmath=sse -D_FILE_OFFSET_BITS=64" \
              -DCMAKE_EXE_LINKER_FLAGS="-m32" \
              -DCMAKE_SHARED_LINKER_FLAGS="-m32" \
+             -DBUILD_SHARED_LIBS=ON \
              -DGGML_NATIVE=OFF \
+             -DGGML_SSE42=OFF \
              -DGGML_AVX=OFF \
              -DGGML_AVX2=OFF \
+             -DGGML_AVX512=OFF \
              -DGGML_FMA=OFF \
              -DGGML_F16C=OFF \
+             -DGGML_BMI2=OFF \
              -DGGML_OPENMP=ON \
              -DLLAMA_CURL=OFF \
              -DLLAMA_BUILD_UI=OFF \
