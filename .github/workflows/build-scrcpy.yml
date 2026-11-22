@@ -1,4 +1,4 @@
-name: Build scrcpy (Linux x86 32-bit)
+name: Build llama.cpp (Linux x86 32-bit)
 
 on:
   workflow_dispatch:
@@ -32,7 +32,10 @@ jobs:
          
       - name: Build llama.cpp
         run: |
-          patch --dry-run -p2 -d llama.cpp < mychanges.patch
+          pwd
+          ls -l
+          ls -l ..
+          patch --dry-run -p2 -d llama.cpp < ../mychanges.patch
           patch -p2 -d llama.cpp < mychanges.patch
           cd llama.cpp
 
