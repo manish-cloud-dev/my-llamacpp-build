@@ -56,6 +56,7 @@ jobs:
              -DGGML_OPENMP=ON \
              -DLLAMA_CURL=OFF \
              -DLLAMA_BUILD_WEBUI=OFF \
+             -DLLAMA_BUILD_SERVER=OFF \
              -DLLAMA_BUILD_TESTS=OFF \
              -DLLAMA_BUILD_EXAMPLES=ON \
              -DLLAMA_BUILD_SERVER=ON 
@@ -65,11 +66,11 @@ jobs:
         run: |
           file llama.cpp/build/bin/llama-cli
           ls -lh -- llama.cpp/build/bin/llama-cli
-          ls -lh -- llama.cpp/build/bin/llama-server
+          #ls -lh -- llama.cpp/build/bin/llama-server
           ls -lh -- llama.cpp/build/bin/llama-quantize
           mkdir -p dist/lib
           cp llama.cpp/build/bin/llama-cli  dist/llama-cli.bin
-          cp llama.cpp/build/bin/llama-server  dist/llama-server.bin
+          #cp llama.cpp/build/bin/llama-server  dist/llama-server.bin
           cp llama.cpp/build/bin/llama-quantize  dist/llama-quantize.bin
           cp -vL llama.cpp/build/bin/*.so dist/lib/ 2>/dev/null || true
           
@@ -78,7 +79,8 @@ jobs:
           cp -vL /lib/ld-linux.so.2 dist/lib/
           
           #create wrapper
-          for bin in llama-cli llama-server llama-quantize; do
+          #for bin in llama-cli llama-server llama-quantize; do
+          for bin in llama-cli llama-quantize; do
              cat << WRAP > "dist/$bin"
              #!/bin/sh
              DIR="\$(cd "\$(dirname "\$0")" && pwd)"
