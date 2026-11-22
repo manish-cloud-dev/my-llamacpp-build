@@ -41,8 +41,11 @@ jobs:
           patch --dry-run -p2 -d llama.cpp < mychanges.patch
           patch -p2 -d llama.cpp < mychanges.patch
           cd llama.cpp
+          # Remove ui, server, and app from tools/CMakeLists.txt so only CLI tools are configured
           sed -i '/add_subdirectory(ui)/d' tools/CMakeLists.txt
-
+          sed -i '/add_subdirectory(server)/d' tools/CMakeLists.txt
+          sed -i '/add_subdirectory(app)/d' tools/CMakeLists.txt
+          
           cmake -B build -G Ninja \
              -DCMAKE_BUILD_TYPE=Release \
              -DCMAKE_C_FLAGS="-m32 -march=bonnell -mtune=atom  -msse2 -mfpmath=sse -D_FILE_OFFSET_BITS=64" \
