@@ -81,8 +81,8 @@ jobs:
           
           cmake -B build -G Ninja \
              -DCMAKE_BUILD_TYPE=Release \
-             -DCMAKE_C_FLAGS="-m32 -march=pentium4 -msse2 -mno-sse3 -mno-ssse3 -mno-sse4.1 -mno-sse4.2 -mno-avx -mfpmath=sse -D_FILE_OFFSET_BITS=64" \
-             -DCMAKE_CXX_FLAGS="-m32 -march=pentium4 -msse2 -mno-sse3 -mno-ssse3 -mno-sse4.1 -mno-sse4.2 -mno-avx -mfpmath=sse -D_FILE_OFFSET_BITS=64" \
+             -DCMAKE_C_FLAGS="-m32 -march=atom -msse2 -msse3 -mssse3 -mno-sse4.1 -mno-sse4.2 -mno-avx -mfpmath=sse -D_FILE_OFFSET_BITS=64" \
+             -DCMAKE_CXX_FLAGS="-m32 -march=atom -msse2 -msse3 -mssse3 -mno-sse4.1 -mno-sse4.2 -mno-avx -mfpmath=sse -D_FILE_OFFSET_BITS=64" \
              -DCMAKE_EXE_LINKER_FLAGS="-m32" \
              -DCMAKE_SHARED_LINKER_FLAGS="-m32" \
              -DBUILD_SHARED_LIBS=ON \
