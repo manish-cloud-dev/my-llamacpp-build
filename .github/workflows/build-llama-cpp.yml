@@ -41,9 +41,14 @@ jobs:
           patch --dry-run -p2 -d llama.cpp < mychanges.patch
           patch -p2 -d llama.cpp < mychanges.patch
           cd llama.cpp
-          # Remove ui, server, and app from tools/CMakeLists.txt so only CLI tools are configured
-          sed -i '/add_subdirectory(ui)/d' tools/CMakeLists.txt
-          sed -i '/add_subdirectory(app)/d' tools/CMakeLists.txt
+          # Stub out tools/ui so it generates empty ui.cpp/ui.h without downloading from Hugging Face
+          cat << 'UISTUB' > tools/ui/CMakeLists.txt
+          add_custom_command(
+              OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/ui.cpp ${CMAKE_CURRENT_BINARY_DIR}/ui.h
+              COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_CURRENT_BINARY_DIR}/ui.cpp ${CMAKE_CURRENT_BINARY_DIR}/ui.h
+          )
+          add_custom_target(llama-ui-assets DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/ui.cpp ${CMAKE_CURRENT_BINARY_DIR}/ui.h)
+          UISTUB
           
           cmake -B build -G Ninja \
              -DCMAKE_BUILD_TYPE=Release \
@@ -68,18 +73,18 @@ jobs:
          
       - name: Verify arch and bundle
         run: |
-          file llama.cpp/build/bin/llama-app
+          file llama.cpp/build/bin/llama
           mkdir -p dist/lib
-          cp llama.cpp/build/bin/llama-app  dist/llama-app.bin
+          cp llama.cpp/build/bin/llama  dist/llama.bin
           cp -vL llama.cpp/build/bin/*.so dist/lib/ 2>/dev/null || true
           
           #bundle 
-          ldd dist/llama-app.bin | grep "=> /" | awk '{print $3}' | xargs -I '{}' cp -vL '{}' dist/lib/
+          ldd dist/llama.bin | grep "=> /" | awk '{print $3}' | xargs -I '{}' cp -vL '{}' dist/lib/
           cp -vL /lib/ld-linux.so.2 dist/lib/
           
           #create wrapper
           #for bin in llama-cli llama-server llama-quantize; do
-          for bin in llama-app; do
+          for bin in llama; do
              cat << WRAP > "dist/$bin"
              #!/bin/sh
              DIR="\$(cd "\$(dirname "\$0")" && pwd)"
